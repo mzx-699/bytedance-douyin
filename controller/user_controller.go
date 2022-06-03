@@ -20,11 +20,11 @@ type UserResponse struct {
 
 func UserInfo(c *gin.Context) {
 	token := c.Query("token")
-
-	if user, exist := service.QueryUserByToken(token); exist {
+	user_id := c.Query("user_id")
+	if user, _, exist := checkUser(token, user_id, c); exist {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 0},
-			User:     user,
+			User:     *user,
 		})
 	} else {
 		c.JSON(http.StatusOK, UserResponse{
@@ -41,13 +41,15 @@ func Register(c *gin.Context) {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "MD5 fail"},
 		})
+		return
 	}
 	token := username + passWord
 
-	if _, exist := service.QueryUserByToken(token); exist {
+	if _, _, exist := checkUser(token, "", c); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "User already exist"},
 		})
+
 	} else {
 		// 创建用户
 		if id, b := service.CreateUser(username, token); b {
@@ -56,10 +58,12 @@ func Register(c *gin.Context) {
 				UserId:   int64(id),
 				Token:    username + password,
 			})
+
 		} else {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 1, StatusMsg: "Create fail"},
 			})
+
 		}
 
 	}
@@ -74,10 +78,11 @@ func Login(c *gin.Context) {
 		c.JSON(http.StatusOK, UserResponse{
 			Response: Response{StatusCode: 1, StatusMsg: "MD5 fail"},
 		})
+		return
 	}
 	token := username + passWord
 
-	if user, exist := service.QueryUserByToken(token); exist {
+	if user, _, exist := checkUser(token, "", c); exist {
 		c.JSON(http.StatusOK, UserLoginResponse{
 			Response: Response{StatusCode: 0},
 			UserId:   user.Id,

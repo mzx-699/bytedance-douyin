@@ -4,14 +4,13 @@ import (
 	"douyin/repository"
 )
 
-func QueryUserByToken(token string) (User, bool) {
-	u, err := repository.NewUserDaoInstance().QueryUserByToken(token)
-	if err != nil {
-		panic(err)
-		return User{}, false
-	}
-	if u.ID == 0 {
-		return User{}, false
+type UserService struct {
+}
+
+func QueryUserByTokenAndUid(token string, uid int64) (*User, bool) {
+	u, err := repository.NewUserDaoInstance().QueryUserByTokenAndUid(token, uid)
+	if err != nil || u == nil {
+		return nil, false
 	}
 	user := User{
 		Id:            int64(u.ID),
@@ -20,7 +19,37 @@ func QueryUserByToken(token string) (User, bool) {
 		FollowCount:   u.FollowCount,
 		IsFollow:      u.IsFollow,
 	}
-	return user, true
+	return &user, true
+}
+
+func QueryUserByToken(token string) (*User, bool) {
+	u, err := repository.NewUserDaoInstance().QueryUserByToken(token)
+	if err != nil || u == nil {
+		return nil, false
+	}
+	user := User{
+		Id:            int64(u.ID),
+		Name:          u.Name,
+		FollowerCount: u.FollowerCount,
+		FollowCount:   u.FollowCount,
+		IsFollow:      u.IsFollow,
+	}
+	return &user, true
+}
+
+func QueryUserById(uid int64) (*User, bool) {
+	u, err := repository.NewUserDaoInstance().QueryUserById(uid)
+	if err != nil || u == nil {
+		return nil, false
+	}
+	user := User{
+		Id:            int64(u.ID),
+		Name:          u.Name,
+		FollowerCount: u.FollowerCount,
+		FollowCount:   u.FollowCount,
+		IsFollow:      u.IsFollow,
+	}
+	return &user, true
 }
 
 func CreateUser(name string, token string) (uint, bool) {
@@ -33,7 +62,6 @@ func CreateUser(name string, token string) (uint, bool) {
 	}
 	err := repository.NewUserDaoInstance().CreateUser(&user)
 	if err != nil {
-		panic(err)
 		return 0, false
 	}
 	return user.ID, true

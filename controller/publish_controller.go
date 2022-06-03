@@ -54,9 +54,11 @@ func Publish(c *gin.Context) {
 	if err != nil {
 		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Cover save fail"})
+		return
 	}
-	if b := service.CreateVideo(int32(user.Id), finalName, filenameOnly+".png", title); !b {
+	if b := service.CreateVideo(user.Id, finalName, filenameOnly+".png", title); !b {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "CreateVideo save fail"})
+		return
 	}
 	c.JSON(http.StatusOK, Response{
 		StatusCode: 0,
@@ -67,11 +69,19 @@ func Publish(c *gin.Context) {
 // PublishList all users have same publish video list
 func PublishList(c *gin.Context) {
 	token := c.Query("token")
-	videos := service.QueryVideosByToken(token)
-	c.JSON(http.StatusOK, VideoListResponse{
-		Response: Response{
-			StatusCode: 0,
-		},
-		VideoList: videos,
-	})
+	user_id := c.Query("user_id")
+	if _, uid, exist := checkUser(token, user_id, c); exist {
+		videos := service.QueryVideosByUid(uid, c.ClientIP(), Port)
+		c.JSON(http.StatusOK, VideoListResponse{
+			Response: Response{
+				StatusCode: 0,
+			},
+			VideoList: videos,
+		})
+	} else {
+		c.JSON(http.StatusOK, UserResponse{
+			Response: Response{StatusCode: 1, StatusMsg: "User doesn't exist"},
+		})
+	}
+
 }

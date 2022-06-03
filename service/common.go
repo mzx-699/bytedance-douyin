@@ -25,3 +25,7 @@ type User struct {
 	FollowerCount int64  `json:"follower_count,omitempty"`
 	IsFollow      bool   `json:"is_follow,omitempty"`
 }
+
+type Service interface {
+	convert()
+}
