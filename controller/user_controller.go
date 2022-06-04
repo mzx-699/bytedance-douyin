@@ -9,7 +9,7 @@ import (
 
 type UserLoginResponse struct {
 	Response
-	UserId int64  `json:"user_id,omitempty"`
+	UserId uint   `json:"user_id,omitempty"`
 	Token  string `json:"token"`
 }
 
@@ -35,6 +35,12 @@ func UserInfo(c *gin.Context) {
 
 func Register(c *gin.Context) {
 	username := c.Query("username")
+	if res := service.CheckUser(username); !res {
+		c.JSON(http.StatusOK, UserResponse{
+			Response: Response{StatusCode: 1, StatusMsg: "User is exist"},
+		})
+		return
+	}
 	password := c.Query("password")
 	passWord, b := util.MD5PWD(password)
 	if !b {
@@ -55,7 +61,7 @@ func Register(c *gin.Context) {
 		if id, b := service.CreateUser(username, token); b {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 0},
-				UserId:   int64(id),
+				UserId:   id,
 				Token:    username + password,
 			})
 
@@ -63,7 +69,6 @@ func Register(c *gin.Context) {
 			c.JSON(http.StatusOK, UserLoginResponse{
 				Response: Response{StatusCode: 1, StatusMsg: "Create fail"},
 			})
-
 		}
 
 	}

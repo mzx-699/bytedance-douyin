@@ -9,9 +9,9 @@ import (
 type Relation struct {
 	gorm.Model
 	// 被关注
-	Follow int64 `gorm:"column:follow"`
+	Follow uint `gorm:"column:follow"`
 	// 关注人
-	Follower int64 `gorm:"column:follower"`
+	Follower uint  `gorm:"column:follower"`
 	Cancel   int64 `gorm:"column:cancel"`
 }
 
@@ -35,8 +35,9 @@ func NewRelationDaoInstance() *RelationDao {
 
 func (*RelationDao) CreateRelation(relation *Relation) error {
 	tx := db.Begin()
+	var orelation Relation
 	// 查找是否有一个被取消的记录
-	err := db.Where("follow = ? AND follower = ?", relation.Follow, relation.Follower).First(&Favorite{}).Error
+	err := db.Where("follow = ? AND follower = ?", relation.Follow, relation.Follower).First(&orelation).Error
 	// 当前没有这个记录
 	if err == gorm.ErrRecordNotFound {
 		// 为空则创建
@@ -49,7 +50,11 @@ func (*RelationDao) CreateRelation(relation *Relation) error {
 		util.Logger.Error("CreateRelation err:" + err.Error())
 		tx.Rollback()
 		return err
-	} else {
+	} else { // 已经存在一个
+		if orelation.Cancel == 0 {
+			tx.Commit()
+			return nil
+		}
 		if err := db.Model(Relation{}).Where("follow = ? AND follower = ? AND cancel = 1", relation.Follow, relation.Follower).
 			Update("cancel", gorm.Expr("cancel & 0")).Error; err != nil {
 			util.Logger.Error("CreateRelation err:" + err.Error())
@@ -76,7 +81,7 @@ func (*RelationDao) CreateRelation(relation *Relation) error {
 	return nil
 }
 
-func (*RelationDao) DeleteRelation(follow int64, follower int64) error {
+func (*RelationDao) DeleteRelation(follow uint, follower uint) error {
 	tx := db.Begin()
 	if err := db.Model(Relation{}).Where("follow = ? AND follower = ?", follow, follower).
 		Update("cancel", gorm.Expr("cancel | 1")).Error; err != nil {
@@ -103,12 +108,15 @@ func (*RelationDao) DeleteRelation(follow int64, follower int64) error {
 }
 
 // 关注 / 粉丝
-func (*RelationDao) CheckRelation(follow int64, follower int64) (bool, error) {
+func (*RelationDao) CheckRelation(follow uint, follower uint) (bool, error) {
+	if follower <= 0 {
+		return false, nil
+	}
 	if follow <= 0 || follower <= 0 {
 		return false, nil
 	}
-	var favorite Favorite
-	err := db.Where("follow = ? and follower = ?", follow, follower).First(&favorite).Error
+	var relation Relation
+	err := db.Where("follow = ? and follower = ?", follow, follower).First(&relation).Error
 	if err == gorm.ErrRecordNotFound {
 		return false, nil
 	}

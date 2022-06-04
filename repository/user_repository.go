@@ -33,7 +33,7 @@ func NewUserDaoInstance() *UserDao {
 	return userDao
 }
 
-func (*UserDao) QueryUserById(id int64) (*User, error) {
+func (*UserDao) QueryUserById(id uint) (*User, error) {
 	var user User
 	err := db.Where("id = ?", id).First(&user).Error
 	if err == gorm.ErrRecordNotFound {
@@ -52,6 +52,18 @@ func (*UserDao) CreateUser(user *User) error {
 		return err
 	}
 	return nil
+}
+
+func (*UserDao) CheckUser(username string) (bool, error) {
+	err := db.Where("name = ?", username).First(&User{}).Error
+	if err == gorm.ErrRecordNotFound { //不存在
+		return true, nil
+	}
+	if err != nil {
+		util.Logger.Error("CreateUser err:" + err.Error())
+		return false, err
+	}
+	return false, nil
 }
 
 func (*UserDao) QueryUserByTokenAndUid(token string, uid int64) (*User, error) {
@@ -81,7 +93,7 @@ func (*UserDao) QueryUserByToken(token string) (*User, error) {
 }
 
 // 关注
-func (*UserDao) QueryFollowsByUid(follower int64) ([]User, error) {
+func (*UserDao) QueryFollowsByUid(follower uint) ([]User, error) {
 	var users []User
 	sub := db.Table(Relation{}.TableName()).Select("follow").Where("follower = ? AND cancel = 0", follower)
 	if err := db.Where("id IN (?)", sub).Find(&users).Error; err != nil {
@@ -92,7 +104,7 @@ func (*UserDao) QueryFollowsByUid(follower int64) ([]User, error) {
 }
 
 // 粉丝
-func (*UserDao) QueryFollowersByUid(follow int64) ([]User, error) {
+func (*UserDao) QueryFollowersByUid(follow uint) ([]User, error) {
 	var users []User
 	sub := db.Table(Relation{}.TableName()).Select("follower").Where("follow = ? AND cancel = 0", follow)
 	if err := db.Where("id IN (?)", sub).Find(&users).Error; err != nil {

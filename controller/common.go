@@ -27,7 +27,7 @@ func checkUser(token string, user_id string, c *gin.Context) (*service.User, int
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User Id fail"})
 	}
 	if token == "" {
-		user, exist = service.QueryUserById(uid)
+		user, exist = service.QueryUserById(uint(uid))
 	} else {
 		user, exist = service.QueryUserByTokenAndUid(token, uid)
 	}

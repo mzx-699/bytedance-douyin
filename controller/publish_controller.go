@@ -71,7 +71,7 @@ func PublishList(c *gin.Context) {
 	token := c.Query("token")
 	user_id := c.Query("user_id")
 	if _, uid, exist := checkUser(token, user_id, c); exist {
-		videos := service.QueryVideosByUid(uid, c.ClientIP(), Port)
+		videos := service.QueryVideosByUid(uint(uid), c.ClientIP(), Port)
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: Response{
 				StatusCode: 0,

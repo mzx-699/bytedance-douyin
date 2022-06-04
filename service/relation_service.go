@@ -5,7 +5,7 @@ import "douyin/repository"
 type RelService struct {
 }
 
-func CreateRelation(follow int64, follower int64) bool {
+func CreateRelation(follow uint, follower uint) bool {
 	relation := repository.Relation{Follow: follow, Follower: follower, Cancel: 0}
 	err := repository.NewRelationDaoInstance().CreateRelation(&relation)
 	if err != nil {
@@ -15,7 +15,7 @@ func CreateRelation(follow int64, follower int64) bool {
 }
 
 // 被关注 / 粉丝
-func DeleteRelation(follow int64, follower int64) bool {
+func DeleteRelation(follow uint, follower uint) bool {
 	err := repository.NewRelationDaoInstance().DeleteRelation(follow, follower)
 	if err != nil {
 		return false
@@ -24,16 +24,16 @@ func DeleteRelation(follow int64, follower int64) bool {
 }
 
 // 找关注
-func QueryFollowsByUid(follower int64) ([]User, bool) {
+func QueryFollowsByUid(follower uint) ([]User, bool) {
 	users, err := repository.NewUserDaoInstance().QueryFollowsByUid(follower)
 	if err != nil {
 		return nil, false
 	}
-	return new(RelService).convert(-1, users, true), true
+	return new(RelService).convert(0, users, true), true
 }
 
 //找粉丝
-func QueryFollowersByUid(follow int64) ([]User, bool) {
+func QueryFollowersByUid(follow uint) ([]User, bool) {
 	users, err := repository.NewUserDaoInstance().QueryFollowersByUid(follow)
 	if err != nil {
 		return nil, false
@@ -42,13 +42,14 @@ func QueryFollowersByUid(follow int64) ([]User, bool) {
 	return new(RelService).convert(follow, users, false), true
 }
 
-func (RelService) convert(follower int64, rusers []repository.User, isFollow bool) (users []User) {
+func (RelService) convert(follower uint, rusers []repository.User, isFollow bool) (users []User) {
 	for _, ruser := range rusers {
 		if !isFollow { //如果是找粉丝
 			// 检查是否关注了粉丝
-			isFollow, _ = repository.NewRelationDaoInstance().CheckRelation(int64(ruser.ID), follower)
+			isFollow, _ = repository.NewRelationDaoInstance().CheckRelation(ruser.ID, follower)
 		}
-		user := User{Id: int64(ruser.ID),
+		user := User{Id: ruser.ID,
+			Name:          ruser.Name,
 			FollowCount:   ruser.FollowCount,
 			FollowerCount: ruser.FollowerCount,
 			IsFollow:      isFollow}

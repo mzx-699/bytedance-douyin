@@ -37,7 +37,7 @@ func FollowList(c *gin.Context) {
 		return
 	}
 
-	if users, success := service.QueryFollowsByUid(user.Id); !success {
+	if users, success := service.QueryFollowsByUid(user.Id); success {
 		c.JSON(http.StatusOK, RelationListResponse{
 			Response: Response{
 				StatusCode: 0,
@@ -73,7 +73,7 @@ func FollowerList(c *gin.Context) {
 		return
 	}
 
-	if users, success := service.QueryFollowersByUid(user.Id); !success {
+	if users, success := service.QueryFollowersByUid(user.Id); success {
 		c.JSON(http.StatusOK, RelationListResponse{
 			Response: Response{
 				StatusCode: 0,
@@ -93,24 +93,28 @@ func RelationAction(c *gin.Context) {
 	user, _, exist := checkUser(token, user_id, c)
 	if !exist {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
 	}
 	tuid, err := strconv.ParseInt(to_user_id, 10, 64)
 	if err != nil {
-		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "To User Id is false"})
+		return
 	}
-
+	if uint(tuid) == user.Id {
+		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "You can't follow yourself"})
+		return
+	}
 	at, err := strconv.ParseInt(action_type, 10, 64)
 	if err != nil || at > 2 {
-		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Action_type is false"})
+		return
 	}
 	if at == 1 {
 		//关注
-		service.CreateRelation(tuid, user.Id)
+		service.CreateRelation(uint(tuid), user.Id)
 	} else if at == 2 {
 		//取关
-		service.DeleteRelation(tuid, user.Id)
+		service.DeleteRelation(uint(tuid), user.Id)
 	}
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
 }

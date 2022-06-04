@@ -42,22 +42,23 @@ func FavoriteAction(c *gin.Context) {
 	user, _, exist := checkUser(token, user_id, c)
 	if !exist {
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "User doesn't exist"})
+		return
 	}
 	vid, err := strconv.ParseInt(video_id, 10, 64)
 	if err != nil {
-		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Video Id is false"})
+		return
 	}
 
 	at, err := strconv.ParseInt(action_type, 10, 64)
 	if err != nil || at > 2 {
-		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Action_type is false"})
+		return
 	}
 	if at == 1 {
-		service.CreateFavorite(user.Id, vid)
+		service.CreateFavorite(user.Id, uint(vid))
 	} else if at == 2 {
-		service.DeleteFavorite(user.Id, vid)
+		service.DeleteFavorite(user.Id, uint(vid))
 	}
 	c.JSON(http.StatusOK, Response{StatusCode: 0})
 }

@@ -8,9 +8,10 @@ import (
 
 type Comment struct {
 	gorm.Model
-	User    int64  `gorm:"column:user"`
-	Feed    int64  `gorm:"column:feed"`
+	UserId  uint   `gorm:"column:user_id"`
+	FeedId  int64  `gorm:"column:feed_id"`
 	Content string `gorm:"column:content"`
+	User    User   `gorm:"foreignKey:UserId"`
 }
 
 func (Comment) TableName() string {
@@ -39,8 +40,8 @@ func (*CommentDao) CreateComment(comment *Comment) error {
 		return err
 	}
 	// 评论数 +1
-	if err := db.Table(Feed{}.TableName()).Where("id = ?", comment.Feed).
-		Delete("comment_count", gorm.Expr("comment_count + 1")).Error; err != nil {
+	if err := db.Table(Feed{}.TableName()).Where("id = ?", comment.FeedId).
+		Update("comment_count", gorm.Expr("comment_count + 1")).Error; err != nil {
 		util.Logger.Error("CreateComment err:" + err.Error())
 		tx.Rollback()
 		return err
@@ -51,14 +52,14 @@ func (*CommentDao) CreateComment(comment *Comment) error {
 
 func (*CommentDao) DeleteComment(cid int64, vid int64) error {
 	tx := db.Begin()
-	if err := db.Where("id = ? AND feed = ?", cid, vid).Delete(&Comment{}).Error; err != nil {
+	if err := db.Where("id = ? AND feed_id = ?", cid, vid).Delete(&Comment{}).Error; err != nil {
 		util.Logger.Error("DeleteComment err:" + err.Error())
 		tx.Rollback()
 		return err
 	}
 	// 评论数 -1
 	if err := db.Table(Feed{}.TableName()).Where("id = ?", vid).
-		Delete("comment_count", gorm.Expr("comment_count - 1")).Error; err != nil {
+		Update("comment_count", gorm.Expr("comment_count - 1")).Error; err != nil {
 		util.Logger.Error("DeleteComment err:" + err.Error())
 		tx.Rollback()
 		return err
@@ -69,7 +70,8 @@ func (*CommentDao) DeleteComment(cid int64, vid int64) error {
 
 func (*CommentDao) QueryCommentsByVid(vid int64) ([]Comment, error) {
 	var comments []Comment
-	if err := db.Where("feed = ?", vid).Find(&comments).Error; err != nil {
+	if err := db.Where("feed_id = ?", vid).Preload("User").Find(&comments).Error; err != nil {
+		util.Logger.Error("QueryCommentsByVid err:" + err.Error())
 		return nil, err
 	}
 	return comments, nil

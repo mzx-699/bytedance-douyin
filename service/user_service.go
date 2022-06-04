@@ -12,14 +12,7 @@ func QueryUserByTokenAndUid(token string, uid int64) (*User, bool) {
 	if err != nil || u == nil {
 		return nil, false
 	}
-	user := User{
-		Id:            int64(u.ID),
-		Name:          u.Name,
-		FollowerCount: u.FollowerCount,
-		FollowCount:   u.FollowCount,
-		IsFollow:      u.IsFollow,
-	}
-	return &user, true
+	return new(UserService).convert(u), true
 }
 
 func QueryUserByToken(token string) (*User, bool) {
@@ -27,31 +20,24 @@ func QueryUserByToken(token string) (*User, bool) {
 	if err != nil || u == nil {
 		return nil, false
 	}
-	user := User{
-		Id:            int64(u.ID),
-		Name:          u.Name,
-		FollowerCount: u.FollowerCount,
-		FollowCount:   u.FollowCount,
-		IsFollow:      u.IsFollow,
-	}
-	return &user, true
+	return new(UserService).convert(u), true
 }
 
-func QueryUserById(uid int64) (*User, bool) {
+func QueryUserById(uid uint) (*User, bool) {
 	u, err := repository.NewUserDaoInstance().QueryUserById(uid)
 	if err != nil || u == nil {
 		return nil, false
 	}
-	user := User{
-		Id:            int64(u.ID),
-		Name:          u.Name,
-		FollowerCount: u.FollowerCount,
-		FollowCount:   u.FollowCount,
-		IsFollow:      u.IsFollow,
-	}
-	return &user, true
-}
 
+	return new(UserService).convert(u), true
+}
+func CheckUser(username string) bool {
+	res, err := repository.NewUserDaoInstance().CheckUser(username)
+	if err != nil {
+		return false
+	}
+	return res
+}
 func CreateUser(name string, token string) (uint, bool) {
 	user := repository.User{
 		Name:          name,
@@ -65,4 +51,15 @@ func CreateUser(name string, token string) (uint, bool) {
 		return 0, false
 	}
 	return user.ID, true
+}
+
+func (UserService) convert(ruser *repository.User) *User {
+	user := User{
+		Id:            ruser.ID,
+		Name:          ruser.Name,
+		FollowerCount: ruser.FollowerCount,
+		FollowCount:   ruser.FollowCount,
+		IsFollow:      ruser.IsFollow,
+	}
+	return &user
 }

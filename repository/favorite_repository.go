@@ -8,8 +8,8 @@ import (
 
 type Favorite struct {
 	gorm.Model
-	User   int64 `gorm:"column:user"`
-	Feed   int64 `gorm:"column:feed"`
+	User   uint  `gorm:"column:user"`
+	Feed   uint  `gorm:"column:feed"`
 	Cancel int64 `gorm:"column:cancel"`
 }
 
@@ -66,7 +66,7 @@ func (*FavoriteDao) CreateFavorite(favoirte *Favorite) error {
 	return nil
 }
 
-func (*FavoriteDao) DeleteFavorite(user int64, feed int64) error {
+func (*FavoriteDao) DeleteFavorite(user uint, feed uint) error {
 	tx := db.Begin()
 	if err := db.Model(Favorite{}).Where("user = ? AND feed = ?", user, feed).
 		Update("cancel", gorm.Expr("cancel | 1")).Error; err != nil {
@@ -84,7 +84,7 @@ func (*FavoriteDao) DeleteFavorite(user int64, feed int64) error {
 	return nil
 }
 
-func (*FavoriteDao) CheckFavorite(user int64, feed int64) (bool, error) {
+func (*FavoriteDao) CheckFavorite(user uint, feed uint) (bool, error) {
 	if user <= 0 {
 		return false, nil
 	}

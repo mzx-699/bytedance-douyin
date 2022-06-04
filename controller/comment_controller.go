@@ -41,7 +41,7 @@ func CommentList(c *gin.Context) {
 		panic(err)
 		c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Video Id is false"})
 	}
-	if comments, success := service.QueryCommentsByVid(vid); !success {
+	if comments, success := service.QueryCommentsByVid(vid); success {
 		c.JSON(http.StatusOK, CommentListResponse{
 			Response: Response{
 				StatusCode: 0,
@@ -51,7 +51,7 @@ func CommentList(c *gin.Context) {
 		})
 		return
 	}
-	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "FavoriteList fail"})
+	c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "CommentList fail"})
 
 }
 
@@ -89,8 +89,8 @@ func CommentAction(c *gin.Context) {
 		comment_id := c.Query("comment_id")
 		cid, err := strconv.ParseInt(comment_id, 10, 64)
 		if err != nil {
-			panic(err)
 			c.JSON(http.StatusOK, Response{StatusCode: 1, StatusMsg: "Comment_id is false"})
+			return
 		}
 		res := service.DeleteComment(cid, vid)
 		if res {

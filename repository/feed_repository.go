@@ -8,13 +8,14 @@ import (
 
 type Feed struct {
 	gorm.Model
-	Author        int64  `gorm:"column:author"`
+	UserId        uint   `gorm:"column:user_id"`
 	PlayUrl       string `gorm:"column:play_url"`
 	CoverUrl      string `gorm:"column:cover_url"`
 	Title         string `gorm:"column:title"`
 	FavoriteCount int64  `gorm:"column:favorite_count"`
-	CommentCount  int64  `gorm:"column:commnet_count"`
+	CommentCount  int64  `gorm:"column:comment_count"`
 	IsFavorite    bool   `gorm:"column:is_favorite"`
+	User          User   `gorm:"foreignKey:UserId"`
 }
 
 func (Feed) TableName() string {
@@ -58,7 +59,7 @@ func (*FeedDao) CreateFeed(feed *Feed) error {
 
 func (*FeedDao) QueryVideosByTime(t string) ([]Feed, error) {
 	var feeds []Feed
-	err := db.Where("created_at <= ?", t).Order("created_at desc, id").Limit(30).Find(&feeds).Error
+	err := db.Where("created_at < ?", t).Order("created_at desc, id").Limit(3).Preload("User").Find(&feeds).Error
 	if err != nil {
 		util.Logger.Error("QueryVideosByTime err:" + err.Error())
 		return nil, err
@@ -69,7 +70,7 @@ func (*FeedDao) QueryVideosByTime(t string) ([]Feed, error) {
 func (*FeedDao) QueryVideosByToken(token string) ([]Feed, error) {
 	var feeds []Feed
 	sub := db.Table(User{}.TableName()).Select("id").Where("token = ?", token)
-	err := db.Where("author = (?)", sub).Find(&feeds).Error
+	err := db.Where("user_id = (?)", sub).Find(&feeds).Error
 	if err != nil {
 		util.Logger.Error("QueryVideosByToken err:" + err.Error())
 		return nil, err
@@ -77,19 +78,19 @@ func (*FeedDao) QueryVideosByToken(token string) ([]Feed, error) {
 	return feeds, nil
 }
 
-func (*FeedDao) QueryVideosByUid(uid int64) ([]Feed, error) {
+func (*FeedDao) QueryVideosByUid(uid uint) ([]Feed, error) {
 	var feeds []Feed
-	if err := db.Where("author = ?", uid).Find(&feeds).Error; err != nil {
+	if err := db.Where("user_id = ?", uid).Find(&feeds).Error; err != nil {
 		util.Logger.Error("QueryVideosByUid err:" + err.Error())
 		return nil, err
 	}
 	return feeds, nil
 }
 
-func (*FeedDao) QueryFavoirteVideosByUid(uid int64) ([]Feed, error) {
+func (*FeedDao) QueryFavoirteVideosByUid(uid uint) ([]Feed, error) {
 	var feeds []Feed
 	sub := db.Table(Favorite{}.TableName()).Select("feed").Where("user = ? AND cancel = 0", uid)
-	if err := db.Where("id IN (?)", sub).Find(&feeds).Error; err != nil {
+	if err := db.Where("id IN (?)", sub).Preload("User").Find(&feeds).Error; err != nil {
 		util.Logger.Error("QueryFavoirteVideosByUid err:" + err.Error())
 		return nil, err
 	}
