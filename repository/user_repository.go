@@ -11,7 +11,6 @@ type User struct {
 	Name          string `gorm:"column:name"`
 	FollowCount   int64  `gorm:"column:follow_count"`
 	FollowerCount int64  `gorm:"column:follower_count"`
-	IsFollow      bool   `gorm:"column:is_follow"`
 	Token         string `gorm:"column:token"`
 }
 

@@ -26,5 +26,8 @@ func Init() error {
 	if err := util.InitLogger(); err != nil {
 		return err
 	}
+	if err := util.CreateDirIfNotExist("./public"); err != nil {
+		return err
+	}
 	return nil
 }

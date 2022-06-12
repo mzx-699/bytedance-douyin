@@ -42,9 +42,10 @@ func QueryFollowersByUid(follow uint) ([]User, bool) {
 	return new(RelService).convert(follow, users, false), true
 }
 
-func (RelService) convert(follower uint, rusers []repository.User, isFollow bool) (users []User) {
+func (RelService) convert(follower uint, rusers []repository.User, isFindFollow bool) (users []User) {
 	for _, ruser := range rusers {
-		if !isFollow { //如果是找粉丝
+		var isFollow bool = true
+		if !isFindFollow { //如果是找粉丝
 			// 检查是否关注了粉丝
 			isFollow, _ = repository.NewRelationDaoInstance().CheckRelation(ruser.ID, follower)
 		}

@@ -22,6 +22,9 @@ func Feed(c *gin.Context) {
 		latest = time.Now().Unix() * 1000
 	} else {
 		latest, _ = strconv.ParseInt(parm, 10, 64)
+		if latest < 100000000000 {
+			latest *= 1000
+		}
 	}
 	videos, ret_latest := service.QueryVideos(token, latest, c.ClientIP(), Port)
 	c.JSON(http.StatusOK, FeedResponse{

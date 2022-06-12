@@ -16,7 +16,7 @@ func CreateVideo(userId uint, playUrl string, coverUrl string, title string) boo
 		Title:         title,
 		FavoriteCount: 0,
 		CommentCount:  0,
-		IsFavorite:    false}
+	}
 	err := repository.NewFeedDaoInstance().CreateFeed(&feed)
 	if err != nil {
 		panic(err)
@@ -87,7 +87,7 @@ func (FeeService) convert(uid uint, feeds []repository.Feed, ip string, port str
 			IsFavorite:    isFavorite,
 			Author: User{Id: feed.User.ID,
 				Name:          feed.User.Name,
-				IsFollow:      isFollow,
+				IsFollow:      isFollow || feed.UserId == uid,
 				FollowerCount: feed.User.FollowerCount,
 				FollowCount:   feed.User.FollowCount}})
 		ret_latest = feed.CreatedAt.Unix() * 1000

@@ -89,7 +89,7 @@ func (*FavoriteDao) CheckFavorite(user uint, feed uint) (bool, error) {
 		return false, nil
 	}
 	var favorite Favorite
-	err := db.Where("user = ? and feed = ?", user, feed).First(&favorite).Error
+	err := db.Where("user = ? and feed = ? and cancel = 0", user, feed).First(&favorite).Error
 	if err == gorm.ErrRecordNotFound {
 		return false, nil
 	}

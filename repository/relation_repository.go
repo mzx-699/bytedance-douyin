@@ -109,14 +109,11 @@ func (*RelationDao) DeleteRelation(follow uint, follower uint) error {
 
 // 关注 / 粉丝
 func (*RelationDao) CheckRelation(follow uint, follower uint) (bool, error) {
-	if follower <= 0 {
-		return false, nil
-	}
 	if follow <= 0 || follower <= 0 {
 		return false, nil
 	}
 	var relation Relation
-	err := db.Where("follow = ? and follower = ?", follow, follower).First(&relation).Error
+	err := db.Where("follow = ? and follower = ? and cancel = 0", follow, follower).First(&relation).Error
 	if err == gorm.ErrRecordNotFound {
 		return false, nil
 	}

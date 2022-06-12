@@ -44,7 +44,6 @@ func CreateUser(name string, token string) (uint, bool) {
 		Token:         token,
 		FollowCount:   0,
 		FollowerCount: 0,
-		IsFollow:      false,
 	}
 	err := repository.NewUserDaoInstance().CreateUser(&user)
 	if err != nil {
@@ -59,7 +58,7 @@ func (UserService) convert(ruser *repository.User) *User {
 		Name:          ruser.Name,
 		FollowerCount: ruser.FollowerCount,
 		FollowCount:   ruser.FollowCount,
-		IsFollow:      ruser.IsFollow,
+		IsFollow:      false,
 	}
 	return &user
 }

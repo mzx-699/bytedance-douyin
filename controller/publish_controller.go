@@ -9,14 +9,13 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"time"
 )
 
 type VideoListResponse struct {
 	Response
 	VideoList []service.Video `json:"video_list"`
 }
-
-var filePrefix string = "/static/"
 
 func Publish(c *gin.Context) {
 	token := c.PostForm("token")
@@ -37,7 +36,7 @@ func Publish(c *gin.Context) {
 	}
 
 	filename := filepath.Base(data.Filename)
-	finalName := fmt.Sprintf("%d_%s", user.Id, filename)
+	finalName := fmt.Sprintf("%d_%s_%d", user.Id, filename, time.Now().Unix())
 	videoUrl := filepath.Join("./public/", finalName)
 	if err := c.SaveUploadedFile(data, videoUrl); err != nil {
 		c.JSON(http.StatusOK, Response{
