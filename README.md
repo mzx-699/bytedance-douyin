@@ -203,24 +203,24 @@ douyin
 
 - 用户基本信息
 
-<img src="/Users/mzx/Desktop/GoGoGoGoGo/bytedance/douyin/readme-source/image-20220612170241586.png" alt="image-20220612170241586" style="zoom:25%;" />
+<img src="./readme-source/image-20220612170241586.png" alt="image-20220612170241586" style="zoom:25%;" />
 
 - 喜欢
 
-<img src="/Users/mzx/Library/Application Support/typora-user-images/image-20220612172128895.png" alt="image-20220612172128895" style="zoom:25%;" />
+<img src="./readme-source/image-20220612172128895.png" alt="image-20220612172128895" style="zoom:25%;" />
 
 - 播放
 
-<img src="/Users/mzx/Library/Application Support/typora-user-images/image-20220612165919240.png" alt="image-20220612165919240" style="zoom: 25%;" />
+<img src="./readme-source/image-20220612165919240.png" alt="image-20220612165919240" style="zoom: 25%;" />
 
 - 评论
 
-<img src="/Users/mzx/Library/Application Support/typora-user-images/image-20220612170046199.png" alt="image-20220612170046199" style="zoom:25%;" />
+<img src="./readme-source/image-20220612170046199.png" alt="image-20220612170046199" style="zoom:25%;" />
 
 - 关注
 
-<img src="/Users/mzx/Library/Application Support/typora-user-images/image-20220612170830478.png" alt="image-20220612170830478" style="zoom:25%;" />
+<img src="./readme-source/image-20220612170830478.png" alt="image-20220612170830478" style="zoom:25%;" />
 
 - 粉丝
 
-<img src="/Users/mzx/Desktop/GoGoGoGoGo/bytedance/douyin/readme-source/image-20220612171529030.png" alt="image-20220612171529030" style="zoom:25%;" />
+<img src="./readme-source/image-20220612171529030.png" alt="image-20220612171529030" style="zoom:25%;" />
