@@ -11,7 +11,7 @@
  Target Server Version : 80027
  File Encoding         : 65001
 
- Date: 12/06/2022 17:29:07
+ Date: 13/06/2022 11:19:37
 */
 
 SET NAMES utf8mb4;
@@ -32,7 +32,7 @@ CREATE TABLE `comments` (
   PRIMARY KEY (`id`),
   KEY `feed` (`feed_id`) USING BTREE,
   KEY `delete` (`id`,`feed_id`) USING BTREE COMMENT '删除索引'
-) ENGINE=InnoDB AUTO_INCREMENT=15 DEFAULT CHARSET=utf8mb3;
+) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8mb3;
 
 -- ----------------------------
 -- Table structure for favorites

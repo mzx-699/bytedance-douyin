@@ -2,6 +2,7 @@ package controller
 
 import (
 	"douyin/service"
+	"douyin/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -26,7 +27,7 @@ func Feed(c *gin.Context) {
 			latest *= 1000
 		}
 	}
-	videos, ret_latest := service.QueryVideos(token, latest, c.ClientIP(), Port)
+	videos, ret_latest := service.QueryVideos(token, latest, util.GetIP(), Port)
 	c.JSON(http.StatusOK, FeedResponse{
 		Response:  Response{StatusCode: 0},
 		VideoList: videos,

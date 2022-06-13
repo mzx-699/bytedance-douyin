@@ -2,6 +2,7 @@ package controller
 
 import (
 	"douyin/service"
+	"douyin/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -20,7 +21,7 @@ func FavoriteList(c *gin.Context) {
 		return
 	}
 	user, _, _ := checkUser(token, "", c)
-	if videos, success := service.QueryFavoirteVideosByUid(user.Id, c.ClientIP(), Port); success {
+	if videos, success := service.QueryFavoirteVideosByUid(user.Id, util.GetIP(), Port); success {
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: Response{
 				StatusCode: 0,

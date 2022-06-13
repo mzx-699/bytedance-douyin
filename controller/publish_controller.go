@@ -36,7 +36,7 @@ func Publish(c *gin.Context) {
 	}
 
 	filename := filepath.Base(data.Filename)
-	finalName := fmt.Sprintf("%d_%s_%d", user.Id, filename, time.Now().Unix())
+	finalName := fmt.Sprintf("%d_%d_%s", time.Now().Unix(), user.Id, filename)
 	videoUrl := filepath.Join("./public/", finalName)
 	if err := c.SaveUploadedFile(data, videoUrl); err != nil {
 		c.JSON(http.StatusOK, Response{
@@ -70,7 +70,7 @@ func PublishList(c *gin.Context) {
 	token := c.Query("token")
 	user_id := c.Query("user_id")
 	if _, uid, exist := checkUser(token, user_id, c); exist {
-		videos := service.QueryVideosByUid(uint(uid), c.ClientIP(), Port)
+		videos := service.QueryVideosByUid(uint(uid), util.GetIP(), Port)
 		c.JSON(http.StatusOK, VideoListResponse{
 			Response: Response{
 				StatusCode: 0,

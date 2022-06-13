@@ -7,6 +7,7 @@ import (
 	ffmpeg "github.com/u2takey/ffmpeg-go"
 	"log"
 	"os"
+	"os/exec"
 	"strings"
 )
 
@@ -45,4 +46,14 @@ func SaveImage(videoUrl string, imgUrl string) (string, error) {
 		return "", err
 	}
 	return snapshotName, err
+}
+
+func GetIP() string {
+	cmd := exec.Command("curl", "ipinfo.io/ip")
+	var out bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = os.Stderr
+	_ = cmd.Run()
+	return out.String()
+
 }
