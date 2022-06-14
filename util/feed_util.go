@@ -48,12 +48,17 @@ func SaveImage(videoUrl string, imgUrl string) (string, error) {
 	return snapshotName, err
 }
 
+var ip = ""
+
 func GetIP() string {
-	cmd := exec.Command("curl", "ipinfo.io/ip")
-	var out bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = os.Stderr
-	_ = cmd.Run()
-	return out.String()
+	if ip == "" {
+		cmd := exec.Command("curl", "ipinfo.io/ip")
+		var out bytes.Buffer
+		cmd.Stdout = &out
+		cmd.Stderr = os.Stderr
+		_ = cmd.Run()
+		ip = out.String()
+	}
+	return ip
 
 }
